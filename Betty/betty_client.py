@@ -1,4 +1,4 @@
-# betty_client.py
+# Betty/betty_client.py
 import os
 import discord
 import random
