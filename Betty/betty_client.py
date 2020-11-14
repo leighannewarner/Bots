@@ -4,12 +4,38 @@ import discord
 import random
 
 from dotenv import load_dotenv
+from fuzzywuzzy import fuzz
+from fuzzywuzzy import process
+from zalgo_text import zalgo
 
 load_dotenv()
 client = discord.Client()
 
 questions = {
-  'bloody_mary': ['bloody mary'],
+  'poop_in_the_sink': [
+    'poop in the sink', 
+    'shit in the sink', 
+    'crap in the sink', 
+    'dump in the sink', 
+    'make poop in the sink'
+  ],
+  'black_betty': [
+    'Whoa, Black Betty',
+    'Black Betty had a child',
+    'The damn thing gone wild',
+    'She said, "I\'m worryin\' outta mind"',
+    'The damn thing gone blind',
+    'I said "Oh, Black Betty"',
+    'Oh, Black Betty',
+    'She really gets me high',
+    'You know that\'s no lie',
+    'She\'s so rock steady',
+    'And she\'s always ready',
+    'She\'s from Birmingham',
+    'Way down in Alabam\'',
+    'Well, she\'s shakin\' that thing',
+    'Boy, she makes me sing'
+  ],
   'name': ['Betty', 'Clark'], 
   'age': [
     'How old are you',
@@ -115,75 +141,112 @@ questions = {
     'Turn on the light',
     'Turn off the light',
     'Are there any ghosts',
-    'Give us a sign'
+    'Give us a sign',
+    'GHOST GHOST GHOST',
   ], 
+}
+words = {
+  'bloody_mary': ['bloody mary'],
   'swear_words': [
-    'Fuck',
-    'Bitch',
-    'Shit',
-    'Cunt',
-    'Ass',
-    'Bastard',
-    'Motherfucker',
-    'Arsehole',
-    'Crap',
-    'Pussy',
-    'Dickhead',
+    'Fuck', 'Bitch', 'Shit',  'Cunt', 'Ass', 'Bastard',  'Motherfucker',
+    'Arsehole', 'Asshole', 'Crap', 'Pussy',  'Dickhead', 'Dumbass',
   ],
   'fear_words': [
-    'Frighten',
-    'panic',
-    'Fright',
-    'Hide',
-    'Run',
-    'scared',
-    'scary',
-    'spooky',
-    'Horror',
-    'Scare',
-    'Scream',
+    'Frighten', 'panic',  'Fright',  'Hide',  'Run', 'scared',
+    'scary', 'spooky', 'Horror', 'Scare', 'Scream',
   ],
   'greeting_words': [
-     'Hello',
-  ]
+     'Hello', 'Hi', 'Hewwo',
+  ],
+  'tiddies': [
+    'tibby', 'tibbies', 'tiddy', 'tiddies', 'titty', 'titties', 
+    'boobs', 'boobies', 'breasts'
+    ],
+  'ouija': [
+    'ouija', 'luigi', 'weegee','wegi',
+    'quiche','weeger', 'wa weg', 'wega',
+  ], 
 }
 responses = {
-  'bloody_mary': ['S̰̭̜̯͕̦̳͂̆͋̈̊̏͠ Ą̨͉̠͉̘̹̱͔̞́̿́̅̊̔̂͐̅ C͇͍̞̫̹̫͉̼͋̉̐̈́̈͒̎̑̽͠ R̛̺̝̼̗̣̫͚̓̈́̆̃͘͘͢ I̘̣͇̺̜̻̰͌̃̄̈͘͜ F̶̞͙͎̞̮͙̏̅͆̾̕ I̷̡̤͚͚̪͉̟̦̱̾͆͗̎̀͊̐̀͗ Ç̹͈͍̭͈͕̫͖͓̈̍̑̏͒͐̓̂͛̀ E̢͇̭̤͚̘̓̾̇̆̓̈̀͊̊͠'],
+  'bloody_mary': [
+    'Sacrifice', 'Kill', 'Run', 'Die', 'Leave', 'Sanguinary Betty'
+  ],
+  'poop_in_the_sink': [
+    'That is not where the poop goes',
+    'You\'ll never 100% clear me',
+    'No',
+  ],
+  'tiddies': [
+    'Do the girl aliens have tiddies?',
+    'Left one is still attached',
+    'Show feet',
+  ],
+  'black_betty': ['(Bam-ba-Lam)'],
   'name': [
-    'B̵̻͓̗̞̒̾͋͟͞͡͡ Ȩ̸̪̭̠̗̩̯͓͆͆͌́̓̑͋́̆͟ Ṭ̶̨̜͖̗̼̘̻̈͑̈́̏̒ T̷̛͚̥̩̝̙̣̠̐͐́̚͘ Ỳ̪̱̬͓̰̽͋̀͠͠ C̷͓̣̝̗͆̏͑̿͗̏̈́̒͘͡ͅ L̶̬̺̪͙͚͓̑́̏͆̽̾́̉͘ À̸̧̪̳͖͈̆͛̉̾͋͐̔͋ R̡̡̞̰̝̱̼̱͂̄̓̒͑̌͠ K̝̙͓̰̳͓̏̈́̏̇̄̕͢͜',
-    'B̧̬͇͖͔̲͚̿̋̌̃̊͆͠ͅ L̷͚͍̪̟̜̫̆͊́͋́̈́̌͒̕͜͠ A̷̘͇̬̯̝̱͑̇͑̅̀̂̾͜͟ Ç̸̛͎̱̠̞͇̬̓̏̐̈̈́͒͌ K̛̝̗͚̳̰̪͋̔͒̃̊ B̡̝͖̦̫͑̿̅̏̍͊͡ É̷̯̣̘͖͇͕̏͂̐̒́̇͌͢͠͡ T̢̧̛͙̰̙̀̌̈́͛̈́̊̎̕͝ Ṭ̷̨̡͓̪̮̎̈́̓͆͊̊̏̍̏͟͠ Ÿ̩̫̘̻́͂́̄̓͛̎̾͟ (̷̧̛̺̖̞̈́̑̽͐̄͛̂̚͞ͅB̨̨͎͙̣͓̞͛̓̋̿̓͡A͈̘̥͎̣͐̅́́̏̾̈́̏̐̃M̸̛̤̲̪̫͓͇͖̑͆͛̎̍͒̍̚͜͞ͅA̸̹͉͔̬͎̗͑́̄̓̓͆L̵̨̢̛͕͖͚̟̘̗̺͚̈̎̿̓̎̄͠Ā̭̙̭͎̬́̈͛̊̽̈́̉̕M̸̰͔̰̱̠̑́̔͒̄̇)̷̨̡̘̮̪̙̐̊͑͗̃͞ͅ',
-    'ť̪̞̝͖̲̭͓͊͌͐̇̐̌̇ȟ͍̭̹̙̭̱͚̰̲̲́̚̕̚è͈͇̹̞̙̪̫͈̾̿̄̒̉͟͞͡͠r̴̜͍̪̘̯̫̮̾̈́͌̃̉̚͘è̡̨̯̠̠̬̽̏͊͋̍̆̍̚͜ i̢̨̺͉̻̯̙̼̺͂͂̓͌͛͘͠͝s̸͖̟̺̬̥͐͗͐̽͜͢͞͝ n̨̘̜͕͈̝̆͂͊̔̿̍ͅo̮̦͇͉͔̲̯̍͑̿͋͟͝ B̴̡̝̟͎͓̳͇̀̎̓̎̿̏͛̎e̢̧͕̝̹̝͕̊͂̈́͒͘͟͡ť̵̢̮͓̩̻͙̒̐͗͒͛t̡̤̲̳͕̝͚̼̿͌̒̈̈̆́́͜͜ẏ̗͇͉̘̔̂͋̃͜͢ ȏ̴̘̺̲̟̹͔̖̺͚̑̅̂̑͟͝n̟̪̣̼͓͛̓̀͆͋͂͟ļ̶̱̥̳̹̎̾̋͋͐̍y͉̳̖͙̤͔͋̅̾͐̒̎̃͟͞͠ Z̡͕̝͚̙̱̘͓̈̽͂͆̔͢u̸̡̱̤̹̝̲̭͐̓͂̋̕͘͠u̱͇͚͚͚̙͔̽̑͑̍͌͐̓͢l̢̢̛̤͙̥̺͉̞̭͐̐̄́́̈ͅ'
+    'Betty Clark',
+    'Black Betty (Bam-ba-Lam)',
+    'There is no Betty only Zuul'
   ], 
   'age': [
-    'Ǻ̴̡͍̼̳̪̟́́̾̃̐͐̍͞ D̴̢͇̙̩͗̆́̇̓́̐̕͢͡ U̶̻̼̝̻̪͖͗́͌̾̄̍̄̀̅̂ L̷̳̹͙͈̙͍̱̺͆̃͆͗̊ͅ Ţ̸͍̰̤̺̮̰̙̹́́͆͆̐̄',
-    'Ą̵̧͚̫͉̣̻̓̾́̎̀ L̳̺̜̥̖̾̒̋̿̋̏͘͢͠͝A̭̮̬̼̍́̈̈́̏͊̆̐͐ͅD̢͙̩̹͍͊͆̐̌̄̾͘͟ͅY̰̘̳̋͛̈̃͘͜͜͞ Ņ̸̧̭͚͗̀̋͛͒̿̓͞͠͠ͅĘ͔̪͇͕̑̋̈́̀̈́͒̍͋͠V̵̧̫̺͍̘̻̰̏̐̀͂̓͐͡͠Ę̵̺͈̼̝͎̳͇̳̓͐̍̂̔̔̅́͢R̸̤̖̬̬̜̟̭̟̹̂͐̄͆̽́̔͝͞͠ͅ T̢̡͎̰͍̝̹̓̊̾͋̌͗̿͜͜͠Ĕ̮͚͓̰͇̐͌̂̕L̵̢̖̰͍̞̮̩͍̐͗̿̄̅͋̕͜L̶͍̱̯̭̜͕̼͚͆̎̇͂̔̈̚Ṣ̢̛̪̭̈̆́̓̕͟͞',
+    'Adult', 'A lady never tells',
   ], 
   'location': [
-    'B͓̯̖̱̤̩̭̜͐̄̈̓̅̂͑͝Ȩ̨͔̖̝̳̹͇͍̳̿̈́͛̍͑̓Ĥ͈̲͖͔̲̤͈̬͆͗̑̉̈̒͢͠I̶̡̦̙̘̹͙̮̹̻̫̓͂̄͂̑̇̓̀̕Ń̩̯̱̖̲̤̹̺̓̆̓̃̃̚͝D̶̫͚̦̜͓̥̗̗͚́̒̓͋̉͜ Y̷̧̠̟̹͙̮̔̋̑͒̅͡O̷̢̭͍͙̘̙̬̤̜̊̃̔́̃̋̈͡U̸̡̪̥͉̤̫̰͚̓́̆͋͊̔͘͝', 
-    'Ḧ̸̛̫̙̰̮̭̼͍́̿͆͒͛̏͢͢Ę̲̞͖͍̏̃̉̑̽R̰̤̺̬͚̳̥̟̩̎̄̌͑́͞E̶̬͔͕̠̣̍̈̉̅̂̇̊̏͞', 'C̛̛̞̱͍̤͉̟̓͗̓̀͡ͅ L̼̺̩̭̣͇͑̈́̅̔͊͋͑̈́̋ O̵̠͇͎̺̫̰̖͙͒̆̂̕͠͠͠͡ S̶͍̭̰͚͎̥̘̝̫̃͗̋̌̾̊̀͛̚ͅ Ê̘̬̪͙̮͒̏́͗̌͜͟͡',
-    'C̢͉̼̜͖͇͔͈͈̿̂̂̇̇̾̒̓̒͞l̵͇̘̖̬̞̤͂̄̓̈̇̍̅͡ò̪͙͚̼͎̪̲̑̎̈́̆̆͞s̵̹̯͎̰̗̮͔̣̣̆͒͗̿͆͟͝͡e͕͖̙͖̪̙̽̓̎̌̈́̅͗̃̄͘ͅ'
-  ], 
+    'Behind you', 'Here', 'Close', 'Near', 'Far',
+  ],
+  'gender': [
+    'Female'
+  ],
   'difficulty': [
-    'K͍̳̻̣͖̂͂̋͗̀́͜͠ Ȉ̼͍̤̲͎̼̭́̇͗́̅̚̚̕͠ L͔̱̯̱̯̲̥̣̓́͊̓͘͜ L̖̖̣̮̩̈̊͒͋̈́͢', 'R̻̙̜̫̬̪̉̊̄̒̚͟Ȕ͎̖̙̭̒́̐̄͊͒͟͝N̨̢̢͙̩̬̭̤͈̟̄͊̄̍͊͠',
-    'Ṟ̷̛̬̺͈̱͇̲̈̀̅̐̃͢͡ Ů̵̧̨̨͈͓͈̯̦̜͓͂͛̾̀̓̅͡͞ Ǹ̸̹͇̘̣͔̭̭̱̗̈́̂̍͞',
-    'D̴̢̧̠̱̦͔̮̜͌́̈́̔͂̕͟I͈̣͖̹͈͂̈̏̅̂̓̔́̚E̼̝͍͚͗͑͋͒͋̐̐̀̚ͅ,',
-    'Ĺ̢̳͓̣̟̼̙̲̓́̀̅̽́̀͑͛É̺̞̙͙̜̟̮̱̀̋͡͠ͅA̧̮͇̭̭̗̓̂̍̉͗͢͠V̶̢̻̬͙͈͓̅̇̔̏͘Ĕ̴̛̛̜͍̝͕͎̬̪̍̾̀͐̕',
+     'Kill', 'Run', 'Die', 'Leave',
   ], 
   'generic': [
-    '    E̪͖̣̩̰̟͙̳̜͋̑́̊͗̇ͅ',
-    'B̢̩̞̺̩̥̣̙̾̆͗́͂̀̽͘Ǒ̡͍̙̹̭̘͖͓̂͐̿̌̑̄̌̚O͚̥͎̜̜̽̂̋́̈͊̽͜͡ͅ', 
-    'ǫ͇͓͇̱̳̾̆̾́͂̿͠͞͝ö̷̧̡̰̗̝̞͙̬̠̘̾̅̾͂͋͊͝͝͝ǫ̸̮̳̰̠̙̩̯͂̈́̀́̍͢ơ̵̢͎̳̣̘͊̇͋͌̋̅͗̚o̧̝͈̻͚̤͆̿̇̾͘o̞̦̙͚͎͆̎̍͞͠ͅŏ̷̺͔̰̺̘͇̎̽̑̇͛̑̽͠ȯ̵̦̲̘̣͓̦͎̻̰͎̔̈̎̾̊̏ǫ̳̘̞̲͂͆̍̿̕ǫ̛͇̜̯͔͒̇͆̾͞ͅ'
+    'E', 'Boo', 'oooooooooooo', '.?',
     ], 
   'swear_words': [
-    'Y̨̥̲̬̩͙̩͚͔̝͒̃̎̓̂̈́͗o̷̡̠̖̠͇̦̼̲̬̾̍̃̕͞u̴͔̯̪̘̣̥̲̍̆̎̋͊͡ k̸̞̱͉̥̖̊̇̅̓̇̽̊͋̕i̶̘̯͇̦̲̱̘̹̱̾͒́̂̾̂̅͛̈̚͟s̵̡̗̟̩̣̊̑͂͐̀̑͘ś̷̢̹̬͎̟͎͓̳̃̏̃̾͐̔͊ ỳ̵͓̪̗̟̬̝̖͙͛͂̅͐̓̉̆͋ò̗̙̫̟͓̍̿͋̈͘͟ͅú̶̥͙̹͔̭͐̓̐̚r̬̳͍̯̬̻̠̩̀̏̊̏́̈́̊̑͢ m̧̯̹̤͇̘̫͈͕̿͑̈̒͢͠o̸̧̰̬̦̙̹̳̟͕͛̀̓̌̃̎̆t̴̟̰͇̼̦͎̞̑̒̑̄͘h̡̛͚͖̭̪̻͔̅͋̂͒̇̑͊͞͝ę̶̛̮͙̭̯̿̔͊͒̽̐ř̗̣̞̰̖̻̩͍̩̎͐͌̉̂̚͝ w͉̪̭̯̪̟͖͗͑̏͐̀̍͢͝i̢̹͖͙̜͙̖̿͊̀̃̀̎̽̃̓̍͢͟͢t̛͔͙̬͖͔͖̲̭͐̓́͗͆͂̀̇h̷̛̦͈̯̟̮̉̉͗͛̉ t̫̱̼̮̝̏̉̓͛̌̇͡͝h̷̬͙̞̳͖͗͛̑̉́̋͘͜ͅa̴̛̩͔̪̫̼͓̫͋́̅̀́̌͒͜͠ͅț̛̹̯̺̯̻̝̪̞͗̀̆̇͛̑̚͝ m̷̨̪̝̭͇̦̙͊̄̓̉̑̐ō̦͇͈̙͉̭̗̪̌̄̍̒̚͜͞͡͠ư̧̨̢̟̗̘͈̞̤̓̇̏͊̅̆͑͘͝ͅt̴̨̟͕͖̙̔̈̑̔̅̅̀͌̂͟h̴͕͇͎̥̯̐̈́̌̽̕͜͠͡?̧̰̦͙̥̰̜̦̹̇̾̈̃̎̍̅͜͡', 
-    'Į̶̣̼̖̫̖̞̯̰͛͊͂̽͛̓̇̏̈́̎\'̵͍̗̳̣̠̙͖̈́̆̋̌͌̊̉͊́̌͢m̛͔̱̥̰͎̯̙̟̑̑͒͆̆͝͝ ř̵̨͎̟̱̻͇̮̥̌͂̿͒̅̓̀̓͢ự̴̧͓͉̯̬͆͋̃͊̓͆̇b̸̬̣̘̺̭̻̼́͂̀͐̂̚͜͡ͅb̸̨̝͎̘̙̮͓̞͛͗́͆̋͑̌̌͋ë̷̼̰̹́̎̀̑̐͋̕͟͡ͅr̡͇̖͇͎̗̗̫̂̽̒̔̉̚͜ͅ y͉̘̘̙̪̭̝̝̣̱̓̄͋͂̌̀̆́͆o̴͚̰̻͎̯͒̍̀͐̓ư̸̪̖͖̜͉̭̩̔̐̐͐͘̕\'̨̢̛̮͓̱̏͂̈́̌̑̄̾̚͢r̛̪̝̝̯̱̘̱̼̉̀̎̒͜͝è̗͖͕͓̼͊͒͂͂͌͊͌̋͘ g̸̛̛̳͉̤̩̯̤̝̫̬̍͊̅͋͛͝͡ͅĺ̨͕̝̤͖̯̤͐̈͌̐ͅů̴̪̠̱̞̭͍́̄̎̌́͘͟͟ę̵͕̫̣̭̣̩̫̐̍̅͆͂̿̎̎͘'
+    'You kiss your mother with that mouth?', 
+    'I am rubber you are glue',
+    'Rude',
+    'Kill',
+    'Run',
+    'Die',
+    'Leave',
   ],
   'greeting_words': [
-    'H͈͇̞͖͍͋̅̾̎͆̉̅̓͟͠E̴͕̠̱̥͓̔̈̈̈́͑͜͜ͅĻ̴̳̫̫̻̫̙͖͕̠̽̍̓̿͠͠L͇̗̲͔̦͌̋̎̋̓̾̍̓̄̕͢ͅO̢̖̗̯͛́́̓̍͒ͅͅ',
-  ]
+    'hello', 'hi', 'hewwo', 'hewwo mr. pwesident', 'Come play with me',
+  ],
+  'ouija': [
+    'How to do weegi board?',
+    'What is a wega board?',
+    'How to ojo board works?',
+    'How to do planchit withot using ooji board?',
+    'Is it dangerous to play OIJA board?',
+    'Oujiji board??????',
+    'My oujis board is cussing me out?',
+    'Is the oueja board online fake or real?',
+    'It the wija i real game',
+    'Weegee bored or whatever?',
+    'How do I find if there is a ghost in my house without using a weggy board?',
+    'A wiggy board game?',
+    'quiche board',
+    'Wa weg board is that how u spell that evil game thing?'
+    'Luigi board?',
+    'Have you played the Luigi Board?',
+    'My Friends did a Luigi board....and it mentioned me! PLEAS HELP?',
+    'How do Luigi boards work?',
+    'are luigi boards dangerous if you ask something about ghost?',
+    'whats up with the luigi board game is it creepy or what is it possible to die for playing this game?',
+    'Do quija boards actually works?',
+    '(WEEGER) Quija Board Experiences?',
+    'Help pls! : Quija Board (Wega Board) help pls',
+    'how to use wedgie board and is it real?', 
+    'Do wedgie board really work and if so what happened?',
+    'Where do I obtain a wedgie board? Do I have to make my own or can I buy one from a witch or vegan?',
+    'GHOST!!!! GHOST!!!!! GHOST!!!!!!.?',
+  ], 
 }
 
 bloody_mary_counter = 0
+special_keys = ['bloody_mary', 'ouija', 'tiddies', 'poop_in_the_sink', 'black_betty']
 
 @client.event
 async def on_ready():
@@ -200,30 +263,49 @@ def get_key(message_text):
   for key in questions:
     if has_match(message_text.lower(), key):
       return key
+  for key in words:
+    if has_word_match(message_text.lower(), key):
+      return key
   return ''
   
 def has_match(message_text, key):
   for phrase in questions[key]:
-    if(message_text.lower().find(phrase.lower()) != -1):
+    if(fuzz.ratio(message_text.lower(), phrase.lower()) >= 85):
       print('Matched "' + phrase + '" in category ' + key)
       return True
+  return False
+  
+def has_word_match(message_text, key):
+  for phrase in words[key]:
+    for word in message_text.split(' '):
+      if(fuzz.ratio(word.lower(), phrase.lower()) >= 85):
+        print('Matched "' + phrase + '" in category ' + key)
+        return True
   return False
 
 async def send_message(message):
   global bloody_mary_counter
 
   key = get_key(message.content)
+
+  if key == 'bloody_mary':
+    bloody_mary_counter += 1
+    print('Matched bloody_mary #' + str(bloody_mary_counter))
+    if bloody_mary_counter == 3:
+      await bloody_mary(message.channel)
+      return
+  
   response = get_message(key)
   if not response:
     return
-  if key == 'bloody_mary':
-    await message.channel.send(response)
-    await message.channel.send(response)
-    await message.channel.send(response)
-  
-    return
-  
   await message.channel.send(response)
+
+async def bloody_mary(channel):
+  global bloody_mary_counter
+  bloody_mary_counter = 0
+  await channel.send(pick_random(responses['bloody_mary']))
+  await channel.send(pick_random(responses['bloody_mary']))
+  await channel.send(pick_random(responses['bloody_mary']))
 
 def get_message(key):
   global bloody_mary_counter
@@ -232,12 +314,10 @@ def get_message(key):
     return ''
   
   if key == 'bloody_mary':
-    bloody_mary_counter += 1
-    if bloody_mary_counter == 3:
-      blood_mary_counter = 0
-      return pick_random(responses['bloody_mary'])
-    else:
-      return ''
+    return ''
+    
+  if key in special_keys:
+    return pick_random(responses[key])
     
   rand = random.randrange(3)
   if (rand == 0):
@@ -251,7 +331,7 @@ def get_message(key):
   return pick_random(responses[key])
 
 def pick_random(list):
-  index = random.randrange(len(list))
-  return list[index]
+  index = random.randint(0, len(list) - 1)
+  return zalgo.zalgo().zalgofy(list[index])
 
 client.run(os.getenv("CLIENT_TOKEN"))
