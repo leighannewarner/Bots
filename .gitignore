@@ -1,9 +1,3 @@
 
 Betty/.env
-.idea/Bots.iml
-.idea/codeStyles/codeStyleConfig.xml
-.idea/dictionaries/Leigh.xml
-.idea/inspectionProfiles/profiles_settings.xml
-.idea/misc.xml
-.idea/modules.xml
-.idea/vcs.xml
+.idea/
