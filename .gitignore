@@ -1,3 +1,4 @@
 
-Betty/.env
+betty/.env
 .idea/
+*.pyc
