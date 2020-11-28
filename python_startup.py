@@ -1,4 +1,6 @@
 # python_startup.py
 import os
 
-os.system('python3 bots/betty/betty_client.py')
+from betty import betty_client
+
+os.system('python3 Bots/betty/betty_client.py')

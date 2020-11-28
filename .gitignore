@@ -1,3 +1,5 @@
 
 betty/.env
 .idea/
+*.pyc
+test_bot.py
