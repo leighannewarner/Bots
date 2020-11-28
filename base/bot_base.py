@@ -10,10 +10,8 @@ class BaseBot(discord.Client):
         self.api_key = api_key
         self.active_channels = []
 
-        self.run_bot()
-
     def run(self):
-        self.run(self.api_key)
+        super().run(self.api_key)
 
     # EVENT OVERRIDES -------------------------------------------------------------------------------------------------
     async def on_ready(self):
@@ -25,15 +23,14 @@ class BaseBot(discord.Client):
     # CONDITIONS  -----------------------------------------------------------------------------------------------------
     # Add to the list of channels this bot is allowed to respond to
     def add_channel(self, channel):
-        self.active_channels.push(channel)
+        self.active_channels.append(channel)
 
     # Check whether this message is valid for this bot to reply to
-    def __can_reply(self, message):
-        return message.author == self.user and \
-               message.channel.name not in self.active_channels
+    def can_reply(self, message):
+        return message.author != self.user and message.channel.name in self.active_channels
 
     # UTILS  ----------------------------------------------------------------------------------------------------------
-    def __send_response(self, message, response):
+    async def send_response(self, message, response):
         if not response:
             return
         await message.channel.send(response)
