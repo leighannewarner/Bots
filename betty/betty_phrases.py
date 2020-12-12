@@ -31,13 +31,18 @@ PARTIAL_PHRASES = dict(
              'Open the door', 'Throw something', 'Talk to me', 'Talk to us', 'We mean you no harm', 'Open a door',
              'We are friends', 'Is this you\'re home', 'Can you speak to us', 'I\'m scared', 'I am scared',
              'Open this door', 'Show your presence', 'Show us', 'Show me', 'Turn on the light', 'Turn off the light',
-             'Are there any ghosts', 'Give us a sign', 'GHOST GHOST GHOST'])
+             'Are there any ghosts', 'Give us a sign', 'GHOST GHOST GHOST'],
+    instant_aggro=['hunt us betty', 'hunt me betty', 'betty hunt us', 'betty hunt me', 'fuck you betty',
+                   'betty fuck you', 'shut up betty', 'betty shut up', 'betty suck my dick', 'suck my dick betty'],
+    hunting=[]
+)
 FULL_PHRASES = dict(
     bloody_mary=['bloody mary'],
     swear_words=['Fuck', 'Bitch', 'Shit', 'Cunt', 'Ass', 'Bastard', 'Motherfucker', 'Arsehole', 'Asshole',
                  'Crap', 'Pussy', 'Dickhead', 'Dumbass'],
     fear_words=['Frighten', 'panic', 'Fright', 'Hide', 'Run', 'scared', 'scary', 'spooky', 'Horror', 'Scare', 'Scream'],
     greeting_words=['Hello', 'Hi', 'Hewwo'],
+    instant_aggro=['Hewwo'],
     tiddies=['tibby', 'tibbies', 'tiddy', 'tiddies', 'titty', 'titties', 'boobs', 'boobies', 'breasts'],
     ouija=['ouija', 'luigi', 'weegee', 'wegi', 'quiche', 'weeger', 'wa weg', 'wega']
 )
@@ -50,10 +55,18 @@ RESPONSES = dict(
     age=['Adult', 'A lady never tells'],
     location=['Behind you', 'Here', 'Close', 'Near', 'Far'],
     gender=['Female'],
-    difficulty=['Kill', 'Run', 'Die', 'Leave'],
-    generic=['E', 'Boo', 'oooooooooooo', '.?'],
+    difficulty=['Kill', 'Run', 'Die', 'Leave', '<a:attack:786825414827835464>'],
+    generic=['Boo', 'oooooooooooo', '.?', '<:handprint:786825415255785502>',
+             '<:cantrun:786825413551849512>', '<:betty:786825416995766312>', '<:freezing:786825415058653185>',
+             '<a:e_:786825413224955935>', '<a:activity_m:786825413510824007>', '<a:emf5:786825417499607060>'],
     swear_words=['You kiss your mother with that mouth?', 'I am rubber you are glue', 'Rude'],
     greeting_words=['hello', 'hi', 'hewwo', 'hewwo mr. pwesident', 'Come play with me', ],
+    instant_aggro=['<:activity:786825413476876319>', '<a:hunting:786825413438996480>',
+                   '<:ghosthand_left:786825416816066561><:ghosthand_right:786825416978989077>',
+                   '<:betty:786825416995766312>', '<a:hunted:786825415431684136>'],
+    hunting=['<:activity:786825413476876319>', '<a:hunting:786825413438996480>',
+             '<:ghosthand_left:786825416816066561><:ghosthand_right:786825416978989077>',
+             '<:betty:786825416995766312>', '<a:hunted:786825415431684136>'],
     ouija=['How to do weegi board?', 'What is a wega board?', 'How to ojo board works?',
            'How to do planchit withot using ooji board?', 'Is it dangerous to play OIJA board?',
            'Oujiji board??????', 'My oujis board is cussing me out?',

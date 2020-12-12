@@ -3,4 +3,4 @@ import os
 
 from betty import betty_client
 
-os.system('python3 Bots/betty/betty_client.py')
+os.system('python3 bots/betty/betty_client.py')

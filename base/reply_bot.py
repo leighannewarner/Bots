@@ -19,7 +19,7 @@ class ReplyBot(bot_base.BaseBot):
             print('No matched categories')
             return
 
-        response = self.choose_response(matched_categores)
+        response = self.choose_response(matched_categores, message.author)
         await self.send_response(message, response)
 
     # CONDITIONS  -----------------------------------------------------------------------------------------------------
@@ -33,7 +33,7 @@ class ReplyBot(bot_base.BaseBot):
     def add_responses(self, category_name, response_list):
         self.categories[category_name].add_responses(response_list)
 
-    def choose_response(self, matched_categores):
+    def choose_response(self, matched_categores, author):
         return matched_categores[0].choose_response()
 
     def __get_match_categories(self, message):
