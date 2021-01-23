@@ -33,7 +33,8 @@ PARTIAL_PHRASES = dict(
              'Open this door', 'Show your presence', 'Show us', 'Show me', 'Turn on the light', 'Turn off the light',
              'Are there any ghosts', 'Give us a sign', 'GHOST GHOST GHOST'],
     instant_aggro=['hunt us betty', 'hunt me betty', 'betty hunt us', 'betty hunt me', 'fuck you betty',
-                   'betty fuck you', 'shut up betty', 'betty shut up', 'betty suck my dick', 'suck my dick betty'],
+                   'betty fuck you', 'shut up betty', 'betty shut up', 'betty suck my dick', 'suck my dick betty',
+                   'hit me with your car'],
     hunting=[]
 )
 FULL_PHRASES = dict(

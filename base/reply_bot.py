@@ -14,12 +14,12 @@ class ReplyBot(bot_base.BaseBot):
         if not self.can_reply(message):
             return
 
-        matched_categores = self.__get_match_categories(message)
-        if not matched_categores:
+        matched_categories = self.__get_match_categories(message)
+        if not matched_categories:
             print('No matched categories')
             return
 
-        response = self.choose_response(matched_categores, message.author)
+        response = self.choose_response(matched_categories, message.author)
         await self.send_response(message, response)
 
     # CONDITIONS  -----------------------------------------------------------------------------------------------------
@@ -33,12 +33,12 @@ class ReplyBot(bot_base.BaseBot):
     def add_responses(self, category_name, response_list):
         self.categories[category_name].add_responses(response_list)
 
-    def choose_response(self, matched_categores, author):
-        return matched_categores[0].choose_response()
+    def choose_response(self, matched_categories, author):
+        return matched_categories[0].choose_response()
 
     def __get_match_categories(self, message):
-        matched_categores = []
+        matched_categories = []
         for category in self.categories.values():
             if category.has_match(message.content):
-                matched_categores.append(category)
-        return sorted(matched_categores, key=lambda value: value.match_priority, reverse=True)
+                matched_categories.append(category)
+        return sorted(matched_categories, key=lambda value: value.match_priority, reverse=True)
