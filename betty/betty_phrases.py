@@ -21,7 +21,6 @@ PARTIAL_PHRASES = dict(
     difficulty=['What do you want?', 'Why are you here?', 'Do you want to hurt us?', 'Are you angry?',
                 'Do you want us here?', 'Shall we leave?', 'Should we leave?', 'Do you want us to leave?',
                 'What should we do?', 'Can we help?', 'Are you friendly?', 'What are you?'],
-    name=['Betty', 'Clark'],
     generic=['Can you speak', 'Show us', 'Let us know you are here', 'Do something', 'Is there anyone with me',
              'Are you alone', 'Can we speak', 'would like to speak to you', 'Is there anyone here', 'May I ask you',
              'Can you speak to us', 'Would you like to talk', 'Are you the only one here', 'Are you waiting',
@@ -44,6 +43,7 @@ FULL_PHRASES = dict(
     fear_words=['Frighten', 'panic', 'Fright', 'Hide', 'Run', 'scared', 'scary', 'spooky', 'Horror', 'Scare', 'Scream'],
     greeting_words=['Hello', 'Hi', 'Hewwo'],
     instant_aggro=['Hewwo'],
+    name=['Betty', 'Clark'],
     tiddies=['tibby', 'tibbies', 'tiddy', 'tiddies', 'titty', 'titties', 'boobs', 'boobies', 'breasts'],
     ouija=['ouija', 'luigi', 'weegee', 'wegi', 'quiche', 'weeger', 'wa weg', 'wega']
 )

@@ -49,13 +49,15 @@ class Category:
                     print('"' + phrase + '" matched "' + message_text + '" in category ' + self.category_name)
                     return True
             if self.match_type is MatchType.FULL:
-                if self.__phrase_match(phrase, message_text):
+                if self.__full_match(phrase, message_text):
                     print('"' + phrase + '" matched "' + message_text + '" in category ' + self.category_name)
                     return True
         return False
 
     def __phrase_match(self, phrase, message_text):
-        return fuzz.ratio(message_text.lower(), phrase.lower()) >= self.FUZZ_RATIO
+        if len(message_text) < 3:
+            return False
+        return fuzz.partial_ratio(message_text.lower(), phrase.lower()) >= self.FUZZ_RATIO
 
     def __full_match(self, phrase, message_text):
         for word in message_text.split(' '):
