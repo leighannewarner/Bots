@@ -93,4 +93,5 @@ def drop_database():
     conn.close()
 
 
-main()
+if __name__ == "__main__":
+    main()
