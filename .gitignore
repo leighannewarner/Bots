@@ -1,5 +1,6 @@
 
-betty/.env
+*/.env
 .idea/
 *.pyc
 test_bot.py
+*.db
